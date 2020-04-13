@@ -44,6 +44,8 @@ public class CacheConfiguration {
             createCache(cm, it.kamaladafrica.eliminacode.domain.User.class.getName() + ".authorities");
             createCache(cm, it.kamaladafrica.eliminacode.domain.PersistentToken.class.getName());
             createCache(cm, it.kamaladafrica.eliminacode.domain.User.class.getName() + ".persistentTokens");
+            createCache(cm, it.kamaladafrica.eliminacode.domain.Tag.class.getName());
+            createCache(cm, it.kamaladafrica.eliminacode.domain.Seq.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }
