@@ -26,7 +26,7 @@ public class SeqService {
 		this.seqRepository = seqRepository;
 	}
 
-	@Transactional(propagation = Propagation.NESTED, isolation = Isolation.SERIALIZABLE)
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public Long nextVal() {
 		return compiuteNextVal(buildName());
 	}
@@ -48,7 +48,7 @@ public class SeqService {
 		final Long currentVal = seq.getNextValue();
 
 		seq.setNextValue(seq.getNextValue() + seq.getStep());
-
+		seqRepository.save(seq);
 		log.debug("Sequence {}: currentVal = {}, nextval = {}", name, currentVal, seq.getNextValue());
 		return currentVal;
 	}

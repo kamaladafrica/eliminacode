@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -100,13 +101,46 @@ public class TagResource {
 	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
 	 *         the tagDTO, or with status {@code 404 (Not Found)}.
 	 */
-	@GetMapping("/tags/{key}.png")
-	public ResponseEntity<TagDTO> getCode(@PathVariable String key) {
-		// TODO qrcode
-
-		log.debug("REST request to get code Tag : {}", key);
-		Optional<TagDTO> tagDTO = tagService.findOne(key);
+	@GetMapping("/tags/current")
+	public ResponseEntity<TagDTO> getCurrentTag() {
+		log.debug("REST request to get current Tag");
+		Optional<TagDTO> tagDTO = tagService.findCurrentTag();
 		return ResponseUtil.wrapOrNotFound(tagDTO);
+	}
+
+	/**
+	 * {@code GET  /tags/:id} : get the "id" tag.
+	 *
+	 * @param id the id of the tagDTO to retrieve.
+	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+	 *         the tagDTO, or with status {@code 404 (Not Found)}.
+	 */
+	@GetMapping("/tags/next")
+	public ResponseEntity<TagDTO> getNextTag() {
+		log.debug("REST request to get next Tag");
+		Optional<TagDTO> tagDTO = tagService.findNextTag();
+		return ResponseUtil.wrapOrNotFound(tagDTO);
+	}
+
+	@GetMapping("/tags/last")
+	public ResponseEntity<TagDTO> getLastTag() {
+		log.debug("REST request to get last Tag");
+		Optional<TagDTO> tagDTO = tagService.findLastTag();
+		return ResponseUtil.wrapOrNotFound(tagDTO);
+	}
+
+	/**
+	 * {@code GET  /tags/:id} : get the "id" tag.
+	 *
+	 * @param id the id of the tagDTO to retrieve.
+	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+	 *         the tagDTO, or with status {@code 404 (Not Found)}.
+	 */
+	@GetMapping("/tags/{key}.png")
+	public ResponseEntity<byte[]> getCode(@PathVariable String key) {
+		log.debug("REST request qr code Tag : {}", key);
+		byte[] png = tagService.generateQRCode(key);
+		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(png);
 	}
 
 }

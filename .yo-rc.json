@@ -9,7 +9,7 @@
     "packageName": "it.kamaladafrica.eliminacode",
     "packageFolder": "it/kamaladafrica/eliminacode",
     "serverPort": "8080",
-    "authenticationType": "session",
+    "authenticationType": "jwt",
     "cacheProvider": "ehcache",
     "enableHibernateCache": true,
     "websocket": false,
@@ -21,7 +21,6 @@
     "serviceDiscoveryType": false,
     "buildTool": "maven",
     "enableSwaggerCodegen": false,
-    "rememberMeKey": "c99084ba86a140e9f78c6ce79f58c3ed21a737c1fc043c86dd0e86ab14a057d16fab3de50bcdaee74fc462e1b1c99f6ab324",
     "embeddableLaunchScript": false,
     "useSass": true,
     "clientPackageManager": "npm",
@@ -33,6 +32,7 @@
     "dtoSuffix": "DTO",
     "otherModules": [],
     "enableTranslation": false,
-    "blueprints": []
+    "blueprints": [],
+    "jwtSecretKey": "NjY0NDIxZGQyOGNkZjU3NDZkMThmYTdmNjM3ZjFlMzA5YjMwNzc4ZDY0NDEwZDg2ODg0ZmFiYzdhYTA3NTM3MTg2NThiNTUyYjFjYjViM2JjYTkyNjllNjlhYzBhOGZiMzk4ZmFmYmMwY2U4OWZlMTJhNmQ4NThlMTQwNmRiZWE="
   }
 }
