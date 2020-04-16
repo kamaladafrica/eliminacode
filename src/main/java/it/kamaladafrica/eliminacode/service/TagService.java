@@ -9,6 +9,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.LongSummaryStatistics;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,7 +39,9 @@ import it.kamaladafrica.eliminacode.domain.Tag;
 import it.kamaladafrica.eliminacode.domain.Tag_;
 import it.kamaladafrica.eliminacode.repository.TagRepository;
 import it.kamaladafrica.eliminacode.service.dto.TagDTO;
+import it.kamaladafrica.eliminacode.service.dto.TagStatsDTO;
 import it.kamaladafrica.eliminacode.service.mapper.TagMapper;
+import one.util.streamex.StreamEx;
 
 /**
  * Service Implementation for managing {@link Tag}.
@@ -120,7 +123,46 @@ public class TagService {
 	}
 
 	@Transactional(readOnly = true)
-	public byte[] generateQRCode(String key) {
+	public Optional<TagStatsDTO> getStats(String key) {
+		log.debug("Request to get stats Tag");
+
+		if (key != null) {
+			Tag tag = tagRepository.findByKey(UUID.fromString(key)).orElse(null);
+			if (tag == null || tag.getBruciato() != null || tag.getStaccato().isBefore(today())) {
+				return Optional.empty();
+			}
+		}
+
+		List<Tag> tags = tagRepository.findTop1000ByBruciatoIsNotNullOrderByBruciatoDesc();
+		LongSummaryStatistics summary = StreamEx.of(tags)
+				.map(Tag::getBruciato)
+				.mapToLong(Instant::getEpochSecond)
+				.pairMap((a, b) -> {
+					log.debug("pair {}-{}={}", a, b, a - b);
+					return a - b;
+				})
+				.summaryStatistics();
+
+		log.debug("summary: {}", summary);
+
+		tags = tagRepository.findAllByStaccatoGreaterThanEqualOrderByProgressivoDesc(today());
+		long fila = StreamEx.of(tags)
+				.dropWhile(t -> key != null && !t.getKey().toString().equals(key))
+				.filter(t -> !t.getKey().toString().equals(key))
+				.takeWhile(t -> t.getBruciato() == null)
+				.count();
+
+		TagStatsDTO stats = new TagStatsDTO();
+		long avg = Math.round(summary.getAverage() / 60.0);
+		avg = avg == 0 ? 5 : avg;
+		avg = Math.min(5, avg);
+		stats.setTempoStimato(avg);
+		stats.setFila(fila);
+		return Optional.of(stats);
+	}
+
+	@Transactional(readOnly = true)
+	public byte[] generateQRCode(String key, String url) {
 		return tagRepository.findByKey(UUID.fromString(key))
 				.filter(t -> t.getBruciato() == null)
 				.filter(t -> t.getStaccato().isAfter(today()))
@@ -129,7 +171,7 @@ public class TagService {
 						Map<EncodeHintType, ErrorCorrectionLevel> hints = new HashMap<>();
 						hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
 						QRCodeWriter barcodeWriter = new QRCodeWriter();
-						BitMatrix bitMatrix = barcodeWriter.encode(key, BarcodeFormat.QR_CODE, 400, 400, hints);
+						BitMatrix bitMatrix = barcodeWriter.encode(url, BarcodeFormat.QR_CODE, 160, 160, hints);
 						BufferedImage image = MatrixToImageWriter.toBufferedImage(bitMatrix);
 						ByteArrayOutputStream os = new ByteArrayOutputStream();
 						ImageIO.write(image, "png", os);
@@ -163,5 +205,10 @@ public class TagService {
 					tag.setBruciato(Instant.now());
 					tagRepository.save(tag);
 				});
+	}
+
+	public void delete(String key) {
+		tagRepository.findByKey(UUID.fromString(key))
+				.ifPresent(tagRepository::delete);
 	}
 }

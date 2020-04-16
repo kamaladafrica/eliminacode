@@ -1,6 +1,7 @@
 package it.kamaladafrica.eliminacode.repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,5 +24,9 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 	Page<Tag> findAllByStaccatoGreaterThanEqualAndBruciatoIsNotNull(Instant staccato, Pageable page);
 
 	Page<Tag> findAllByStaccatoGreaterThanEqualAndBruciatoIsNull(Instant staccato, Pageable page);
+
+	List<Tag> findTop1000ByBruciatoIsNotNullOrderByBruciatoDesc();
+
+	List<Tag> findAllByStaccatoGreaterThanEqualOrderByProgressivoDesc(Instant staccato);
 
 }

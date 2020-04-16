@@ -4,22 +4,28 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
 import it.kamaladafrica.eliminacode.service.TagService;
 import it.kamaladafrica.eliminacode.service.dto.TagDTO;
+import it.kamaladafrica.eliminacode.service.dto.TagStatsDTO;
 
 /**
  * REST controller for managing {@link it.kamaladafrica.eliminacode.domain.Tag}.
@@ -81,6 +87,46 @@ public class TagResource {
 	}
 
 	/**
+	 * {@code PUT  /tags} : Updates an existing tag.
+	 *
+	 * @param tagDTO the tagDTO to update.
+	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+	 *         the updated tagDTO, or with status {@code 400 (Bad Request)} if the
+	 *         tagDTO is not valid, or with status
+	 *         {@code 500 (Internal Server Error)} if the tagDTO couldn't be
+	 *         updated.
+	 * @throws URISyntaxException if the Location URI syntax is incorrect.
+	 */
+	@DeleteMapping("/tags/{key}")
+	public ResponseEntity<TagDTO> eliminaTag(@PathVariable String key) throws URISyntaxException {
+		log.debug("REST request to brucia Tag : {}", key);
+		tagService.delete(key);
+		return ResponseEntity.noContent()
+				.headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, key))
+				.build();
+	}
+
+	/**
+	 * {@code PUT  /tags} : Updates an existing tag.
+	 *
+	 * @param tagDTO the tagDTO to update.
+	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+	 *         the updated tagDTO, or with status {@code 400 (Bad Request)} if the
+	 *         tagDTO is not valid, or with status
+	 *         {@code 500 (Internal Server Error)} if the tagDTO couldn't be
+	 *         updated.
+	 * @throws URISyntaxException if the Location URI syntax is incorrect.
+	 */
+	@GetMapping("/tags/{key}/delete")
+	public ResponseEntity<String> bruciaTagUrl(@PathVariable String key) throws URISyntaxException {
+		log.debug("REST request to brucia Tag : {}", key);
+		tagService.brucia(key);
+		return ResponseEntity.ok()
+				.contentType(MediaType.TEXT_PLAIN)
+				.body("Numero bruciato " + key);
+	}
+
+	/**
 	 * {@code GET  /tags/:id} : get the "id" tag.
 	 *
 	 * @param id the id of the tagDTO to retrieve.
@@ -129,6 +175,21 @@ public class TagResource {
 		return ResponseUtil.wrapOrNotFound(tagDTO);
 	}
 
+	@GetMapping("/stats/{key}")
+	public ResponseEntity<TagStatsDTO> getStatsTag(@PathVariable String key) {
+		log.debug("REST request to get stats Tag");
+		Optional<TagStatsDTO> stats = tagService.getStats(key);
+		return stats.map(s -> ResponseEntity.ok().body(s))
+				.orElseGet(() -> ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+	}
+
+	@GetMapping("/stats")
+	public ResponseEntity<TagStatsDTO> getStats() {
+		log.debug("REST request to get stats");
+		Optional<TagStatsDTO> stats = tagService.getStats(null);
+		return ResponseUtil.wrapOrNotFound(stats);
+	}
+
 	/**
 	 * {@code GET  /tags/:id} : get the "id" tag.
 	 *
@@ -137,9 +198,12 @@ public class TagResource {
 	 *         the tagDTO, or with status {@code 404 (Not Found)}.
 	 */
 	@GetMapping("/tags/{key}.png")
-	public ResponseEntity<byte[]> getCode(@PathVariable String key) {
+	public ResponseEntity<byte[]> getCode(@PathVariable String key, HttpServletRequest request) {
 		log.debug("REST request qr code Tag : {}", key);
-		byte[] png = tagService.generateQRCode(key);
+		String url = ServletUriComponentsBuilder.fromRequest(request).replacePath("/api/tags/{key}/delete").build(key)
+				.toASCIIString();
+		log.debug("url: {}", url);
+		byte[] png = tagService.generateQRCode(key, url);
 		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(png);
 	}
 
