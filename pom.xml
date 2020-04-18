@@ -842,6 +842,7 @@
 						</execution>
 					</executions>
 					<configuration>
+						<executable>true</executable>
 						<mainClass>${start-class}</mainClass>
 						<fork>true</fork>
 						<!-- Enable the line below to have remote debugging of your application
