@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -89,7 +88,7 @@ public class SeqResourceIT {
         int databaseSizeBeforeCreate = seqRepository.findAll().size();
 
         // Create the Seq
-        restSeqMockMvc.perform(post("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(post("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isCreated());
@@ -112,7 +111,7 @@ public class SeqResourceIT {
         seq.setId(1L);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restSeqMockMvc.perform(post("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(post("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isBadRequest());
@@ -132,7 +131,7 @@ public class SeqResourceIT {
 
         // Create the Seq, which fails.
 
-        restSeqMockMvc.perform(post("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(post("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isBadRequest());
@@ -150,7 +149,7 @@ public class SeqResourceIT {
 
         // Create the Seq, which fails.
 
-        restSeqMockMvc.perform(post("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(post("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isBadRequest());
@@ -168,7 +167,7 @@ public class SeqResourceIT {
 
         // Create the Seq, which fails.
 
-        restSeqMockMvc.perform(post("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(post("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isBadRequest());
@@ -234,7 +233,7 @@ public class SeqResourceIT {
             .step(UPDATED_STEP)
             .nextValue(UPDATED_NEXT_VALUE);
 
-        restSeqMockMvc.perform(put("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(put("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(updatedSeq)))
             .andExpect(status().isOk());
@@ -256,7 +255,7 @@ public class SeqResourceIT {
         // Create the Seq
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restSeqMockMvc.perform(put("/api/seqs").with(csrf())
+        restSeqMockMvc.perform(put("/api/seqs")
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtil.convertObjectToJsonBytes(seq)))
             .andExpect(status().isBadRequest());
@@ -275,7 +274,7 @@ public class SeqResourceIT {
         int databaseSizeBeforeDelete = seqRepository.findAll().size();
 
         // Delete the seq
-        restSeqMockMvc.perform(delete("/api/seqs/{id}", seq.getId()).with(csrf())
+        restSeqMockMvc.perform(delete("/api/seqs/{id}", seq.getId())
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isNoContent());
 

@@ -1,5 +1,8 @@
 package it.kamaladafrica.eliminacode.config;
 
+import it.kamaladafrica.eliminacode.security.*;
+import it.kamaladafrica.eliminacode.security.jwt.*;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -15,10 +18,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
-
-import it.kamaladafrica.eliminacode.security.AuthoritiesConstants;
-import it.kamaladafrica.eliminacode.security.jwt.JWTConfigurer;
-import it.kamaladafrica.eliminacode.security.jwt.TokenProvider;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -96,9 +95,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private JWTConfigurer securityConfigurerAdapter() {
         return new JWTConfigurer(tokenProvider);
     }
-
-	public static void main(String[] args) {
-		BCryptPasswordEncoder e = new BCryptPasswordEncoder();
-		System.out.println(e.encode("ylenia.2008!"));
-	}
 }

@@ -2,6 +2,7 @@ package it.kamaladafrica.eliminacode.domain;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import javax.validation.constraints.*;
@@ -22,8 +23,7 @@ public class Tag implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequenceGenerator")
-    @SequenceGenerator(name = "sequenceGenerator")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "progressivo")
@@ -37,7 +37,8 @@ public class Tag implements Serializable {
     private Instant bruciato;
 
     @NotNull
-    @Column(name = "jhi_key", nullable = false)
+    @Type(type = "uuid-char")
+    @Column(name = "jhi_key", length = 36, nullable = false, unique = true)
     private UUID key;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove

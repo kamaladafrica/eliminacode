@@ -1,0 +1,55 @@
+application {
+  config {
+    applicationType monolith
+    authenticationType jwt
+    baseName eliminacode
+    buildTool maven
+    cacheProvider ehcache
+    clientFramework angularX
+    clientPackageManager npm
+    clientTheme none
+    creationTimestamp 1586800604442
+    databaseType sql
+    devDatabaseType h2Disk
+    dtoSuffix DTO
+    embeddableLaunchScript false
+    enableHibernateCache true
+    enableSwaggerCodegen false
+    enableTranslation false
+    jhiPrefix jhi
+    jhipsterVersion "6.8.0"
+    jwtSecretKey "NjY0NDIxZGQyOGNkZjU3NDZkMThmYTdmNjM3ZjFlMzA5YjMwNzc4ZDY0NDEwZDg2ODg0ZmFiYzdhYTA3NTM3MTg2NThiNTUyYjFjYjViM2JjYTkyNjllNjlhYzBhOGZiMzk4ZmFmYmMwY2U4OWZlMTJhNmQ4NThlMTQwNmRiZWE="
+    languages [en, fr]
+    messageBroker false
+    nativeLanguage en
+    otherModules []
+    packageName it.kamaladafrica.eliminacode
+    prodDatabaseType mysql
+    searchEngine false
+    serverPort 8080
+    serviceDiscoveryType false
+    skipClient true
+    skipServer false
+    skipUserManagement false
+    testFrameworks []
+    useSass true
+    websocket false
+  }
+
+  entities Seq, Tag
+}
+
+entity Seq {
+  name String required unique,
+  step Long required,
+  nextValue Long required
+}
+entity Tag {
+  progressivo Long,
+  staccato Instant required,
+  bruciato Instant,
+  key UUID required unique
+}
+dto Tag with mapstruct
+service Tag with serviceClass
+filter Tag
