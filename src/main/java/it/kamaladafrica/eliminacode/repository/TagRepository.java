@@ -22,7 +22,7 @@ public interface TagRepository extends JpaRepository<Tag, Long>, JpaSpecificatio
 
 	Optional<Tag> findByKey(UUID key);
 
-	@Query("select t.progressivo from Tag t where t.staccato >= CURRENT_DATE and t.progressivo > nvl((select max(x.progressivo) from Tag x where x.bruciato = (select max(y.bruciato) from Tag y)), 0) order by t.progressivo asc")
+	@Query("select t.progressivo from Tag t where t.staccato >= CURRENT_DATE and t.progressivo > coalesce((select max(x.progressivo) from Tag x where x.bruciato = (select max(y.bruciato) from Tag y)), 0) order by t.progressivo asc")
 	List<Long> findNextProgressivi();
 
 	@Query("select max(t.bruciato) from Tag t where t.staccato >= CURRENT_DATE")
