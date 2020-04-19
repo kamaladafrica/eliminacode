@@ -1,6 +1,11 @@
 package it.kamaladafrica.eliminacode.web.rest.errors;
 
-import io.github.jhipster.web.util.HeaderUtil;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.ConcurrencyFailureException;
@@ -18,11 +23,8 @@ import org.zalando.problem.spring.web.advice.ProblemHandling;
 import org.zalando.problem.spring.web.advice.security.SecurityAdviceTrait;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
+import io.github.jhipster.web.util.HeaderUtil;
+import it.kamaladafrica.eliminacode.service.InvalidTagException;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures.
@@ -121,4 +123,9 @@ public class ExceptionTranslator implements ProblemHandling, SecurityAdviceTrait
             .build();
         return create(ex, problem, request);
     }
+
+	@ExceptionHandler
+	public ResponseEntity<Problem> handleInvalidTagException(InvalidTagException ex, NativeWebRequest request) {
+		return create(Status.FORBIDDEN, ex, request);
+	}
 }
