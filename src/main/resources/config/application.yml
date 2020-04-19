@@ -167,6 +167,7 @@ jhipster:
 
 application:
    qrcode-size: 160
+   expiry: 3
    average-tempo: 2.5
 
 
