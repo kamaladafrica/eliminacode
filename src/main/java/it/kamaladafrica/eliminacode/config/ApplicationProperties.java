@@ -5,14 +5,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * Properties specific to Eliminacode.
  * <p>
- * Properties are configured in the {@code application.yml} file.
- * See {@link io.github.jhipster.config.JHipsterProperties} for a good example.
+ * Properties are configured in the {@code application.yml} file. See
+ * {@link io.github.jhipster.config.JHipsterProperties} for a good example.
  */
 @ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 public class ApplicationProperties {
 
 	private int qrcodeSize = 160;
 	private double averageTempo = 2.5; // minuti
+	private int expiry = 15; // minuti
 
 	public double getAverageTempo() {
 		return averageTempo;
@@ -28,6 +29,14 @@ public class ApplicationProperties {
 
 	public void setQrcodeSize(int qrcodeSize) {
 		this.qrcodeSize = qrcodeSize;
+	}
+
+	public int getExpiry() {
+		return expiry;
+	}
+
+	public void setExpiry(int expiry) {
+		this.expiry = expiry;
 	}
 
 }

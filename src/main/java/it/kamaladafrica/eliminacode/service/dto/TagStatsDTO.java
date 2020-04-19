@@ -1,26 +1,37 @@
 package it.kamaladafrica.eliminacode.service.dto;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.List;
 
 public class TagStatsDTO implements Serializable {
 
-	private Long fila;
-	private Long tempoStimato; // minutes
+	private List<Long> fila;
+	private Double tempoStimato; // minutes
+	private Instant tempoLimite;
 
-	public Long getFila() {
+	public List<Long> getFila() {
 		return fila;
 	}
 
-	public void setFila(Long fila) {
+	public void setFila(List<Long> fila) {
 		this.fila = fila;
 	}
 
-	public Long getTempoStimato() {
+	public Double getTempoStimato() {
 		return tempoStimato;
 	}
 
-	public void setTempoStimato(Long tempoStimato) {
+	public void setTempoStimato(Double tempoStimato) {
 		this.tempoStimato = tempoStimato;
+	}
+
+	public Instant getTempoLimite() {
+		return tempoLimite;
+	}
+
+	public void setTempoLimite(Instant tempoLimite) {
+		this.tempoLimite = tempoLimite;
 	}
 
 	@Override
@@ -28,6 +39,7 @@ public class TagStatsDTO implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((fila == null) ? 0 : fila.hashCode());
+		result = prime * result + ((tempoLimite == null) ? 0 : tempoLimite.hashCode());
 		result = prime * result + ((tempoStimato == null) ? 0 : tempoStimato.hashCode());
 		return result;
 	}
@@ -46,6 +58,11 @@ public class TagStatsDTO implements Serializable {
 				return false;
 		} else if (!fila.equals(other.fila))
 			return false;
+		if (tempoLimite == null) {
+			if (other.tempoLimite != null)
+				return false;
+		} else if (!tempoLimite.equals(other.tempoLimite))
+			return false;
 		if (tempoStimato == null) {
 			if (other.tempoStimato != null)
 				return false;
@@ -56,7 +73,7 @@ public class TagStatsDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TagStatsDTO [fila=" + fila + ", tempoStimato=" + tempoStimato + "]";
+		return "TagStatsDTO [fila=" + fila + ", tempoStimato=" + tempoStimato + ", tempoLimite=" + tempoLimite + "]";
 	}
 
 }
