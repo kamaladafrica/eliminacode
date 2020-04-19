@@ -134,4 +134,5 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+   qrcode-url-template: https://eliminacode.conadcitycapena.it/api/tags/{key}/brucia

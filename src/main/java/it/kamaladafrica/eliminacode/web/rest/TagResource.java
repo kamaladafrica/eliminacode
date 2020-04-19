@@ -22,10 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import io.github.jhipster.web.util.HeaderUtil;
 import io.github.jhipster.web.util.ResponseUtil;
+import it.kamaladafrica.eliminacode.config.ApplicationProperties;
 import it.kamaladafrica.eliminacode.service.TagService;
 import it.kamaladafrica.eliminacode.service.dto.TagDTO;
 import it.kamaladafrica.eliminacode.service.dto.TagStatsDTO;
@@ -46,8 +47,11 @@ public class TagResource {
 
 	private final TagService tagService;
 
-	public TagResource(TagService tagService) {
+	private ApplicationProperties applicationProperties;
+
+	public TagResource(TagService tagService, ApplicationProperties applicationProperties) {
 		this.tagService = tagService;
+		this.applicationProperties = applicationProperties;
 	}
 
 	/**
@@ -171,10 +175,8 @@ public class TagResource {
 	public ResponseEntity<byte[]> getCode(@PathVariable String key,
 			@RequestParam(name = "s", required = false) Integer size, HttpServletRequest request) {
 		log.debug("REST request qr code Tag : {}", key);
-		String url = ServletUriComponentsBuilder.fromRequest(request)
-				.replacePath("/api/tags/{key}/brucia")
-				.build(key)
-				.toASCIIString();
+		String url = UriComponentsBuilder.fromHttpUrl(applicationProperties.getQrcodeUrlTemplate())
+				.buildAndExpand(key).toUriString();
 		log.debug("url: {}", url);
 		Optional<byte[]> png = tagService.generateQRCode(key, url, size);
 		HttpHeaders headers = new HttpHeaders();

@@ -122,4 +122,5 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+application:
+   qrcode-url-template: http://192.168.0.34:8080/api/tags/{key}/brucia
