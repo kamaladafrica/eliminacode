@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -117,7 +120,7 @@ public class TagResource {
 	 *         updated.
 	 * @throws URISyntaxException if the Location URI syntax is incorrect.
 	 */
-	@GetMapping("/tags/{key}/delete")
+	@GetMapping("/tags/{key}/brucia")
 	public ResponseEntity<String> bruciaTagUrl(@PathVariable String key) throws URISyntaxException {
 		log.debug("REST request to brucia Tag : {}", key);
 		tagService.brucia(key);
@@ -140,54 +143,21 @@ public class TagResource {
 		return ResponseUtil.wrapOrNotFound(tagDTO);
 	}
 
-	/**
-	 * {@code GET  /tags/:id} : get the "id" tag.
-	 *
-	 * @param id the id of the tagDTO to retrieve.
-	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-	 *         the tagDTO, or with status {@code 404 (Not Found)}.
-	 */
-	@GetMapping("/tags/current")
-	public ResponseEntity<TagDTO> getCurrentTag() {
-		log.debug("REST request to get current Tag");
-		Optional<TagDTO> tagDTO = tagService.findCurrentTag();
-		return ResponseUtil.wrapOrNotFound(tagDTO);
-	}
+	@GetMapping("/tags/{key}/check")
+	public ResponseEntity<TagDTO> tagCheck(@PathVariable String key) {
+		log.debug("REST request to get check Tag : {}", key);
 
-	/**
-	 * {@code GET  /tags/:id} : get the "id" tag.
-	 *
-	 * @param id the id of the tagDTO to retrieve.
-	 * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-	 *         the tagDTO, or with status {@code 404 (Not Found)}.
-	 */
-	@GetMapping("/tags/next")
-	public ResponseEntity<TagDTO> getNextTag() {
-		log.debug("REST request to get next Tag");
-		Optional<TagDTO> tagDTO = tagService.findNextTag();
-		return ResponseUtil.wrapOrNotFound(tagDTO);
-	}
+		if (tagService.checkExpiration(key)) {
+			return ResponseEntity.noContent().build();
+		}
 
-	@GetMapping("/tags/last")
-	public ResponseEntity<TagDTO> getLastTag() {
-		log.debug("REST request to get last Tag");
-		Optional<TagDTO> tagDTO = tagService.findLastTag();
-		return ResponseUtil.wrapOrNotFound(tagDTO);
-	}
-
-	@GetMapping("/stats/{key}")
-	public ResponseEntity<TagStatsDTO> getStatsTag(@PathVariable String key) {
-		log.debug("REST request to get stats Tag");
-		Optional<TagStatsDTO> stats = tagService.getStats(key);
-		return stats.map(s -> ResponseEntity.ok().body(s))
-				.orElseGet(() -> ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+		throw new ResponseStatusException(HttpStatus.NOT_FOUND);
 	}
 
 	@GetMapping("/stats")
 	public ResponseEntity<TagStatsDTO> getStats() {
 		log.debug("REST request to get stats");
-		Optional<TagStatsDTO> stats = tagService.getStats(null);
-		return ResponseUtil.wrapOrNotFound(stats);
+		return ResponseEntity.ok(tagService.getStats());
 	}
 
 	/**
@@ -198,13 +168,18 @@ public class TagResource {
 	 *         the tagDTO, or with status {@code 404 (Not Found)}.
 	 */
 	@GetMapping("/tags/{key}.png")
-	public ResponseEntity<byte[]> getCode(@PathVariable String key, HttpServletRequest request) {
+	public ResponseEntity<byte[]> getCode(@PathVariable String key,
+			@RequestParam(name = "s", required = false) Integer size, HttpServletRequest request) {
 		log.debug("REST request qr code Tag : {}", key);
-		String url = ServletUriComponentsBuilder.fromRequest(request).replacePath("/api/tags/{key}/delete").build(key)
+		String url = ServletUriComponentsBuilder.fromRequest(request)
+				.replacePath("/api/tags/{key}/brucia")
+				.build(key)
 				.toASCIIString();
 		log.debug("url: {}", url);
-		byte[] png = tagService.generateQRCode(key, url);
-		return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(png);
+		Optional<byte[]> png = tagService.generateQRCode(key, url, size);
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.IMAGE_PNG);
+		return ResponseUtil.wrapOrNotFound(png, headers);
 	}
 
 }
