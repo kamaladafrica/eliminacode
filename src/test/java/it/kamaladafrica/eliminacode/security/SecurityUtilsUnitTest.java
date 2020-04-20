@@ -6,7 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
@@ -67,5 +67,12 @@ public class SecurityUtilsUnitTest {
         assertThat(SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.USER)).isTrue();
         assertThat(SecurityUtils.isCurrentUserInRole(AuthoritiesConstants.ADMIN)).isFalse();
     }
+
+	@Test
+	public void password() {
+		BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		String password = encoder.encode("Ylenia2008");
+		System.out.println(password);
+	}
 
 }
