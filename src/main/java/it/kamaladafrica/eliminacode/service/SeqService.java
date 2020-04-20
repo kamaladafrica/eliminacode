@@ -1,6 +1,7 @@
 package it.kamaladafrica.eliminacode.service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,17 @@ public class SeqService {
 	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.SERIALIZABLE)
 	public Long nextVal(String name) {
 		return compiuteNextVal(name);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Long> previewNextVal() {
+		return previewNextVal(buildName());
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Long> previewNextVal(String name) {
+		return seqRepository.findByName(name)
+				.map(Seq::getNextValue);
 	}
 
 	private Long compiuteNextVal(String name) {

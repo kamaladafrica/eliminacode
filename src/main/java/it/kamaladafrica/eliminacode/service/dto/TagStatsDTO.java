@@ -9,6 +9,15 @@ public class TagStatsDTO implements Serializable {
 	private List<Long> fila;
 	private Double tempoStimato; // minutes
 	private Instant tempoLimite;
+	private Long progressivo;
+
+	public Long getProgressivo() {
+		return progressivo;
+	}
+
+	public void setProgressivo(Long progressivo) {
+		this.progressivo = progressivo;
+	}
 
 	public List<Long> getFila() {
 		return fila;
@@ -39,6 +48,7 @@ public class TagStatsDTO implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((fila == null) ? 0 : fila.hashCode());
+		result = prime * result + ((progressivo == null) ? 0 : progressivo.hashCode());
 		result = prime * result + ((tempoLimite == null) ? 0 : tempoLimite.hashCode());
 		result = prime * result + ((tempoStimato == null) ? 0 : tempoStimato.hashCode());
 		return result;
@@ -58,6 +68,11 @@ public class TagStatsDTO implements Serializable {
 				return false;
 		} else if (!fila.equals(other.fila))
 			return false;
+		if (progressivo == null) {
+			if (other.progressivo != null)
+				return false;
+		} else if (!progressivo.equals(other.progressivo))
+			return false;
 		if (tempoLimite == null) {
 			if (other.tempoLimite != null)
 				return false;
@@ -73,7 +88,8 @@ public class TagStatsDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "TagStatsDTO [fila=" + fila + ", tempoStimato=" + tempoStimato + ", tempoLimite=" + tempoLimite + "]";
+		return "TagStatsDTO [fila=" + fila + ", tempoStimato=" + tempoStimato + ", tempoLimite=" + tempoLimite
+				+ ", progressivo=" + progressivo + "]";
 	}
 
 }

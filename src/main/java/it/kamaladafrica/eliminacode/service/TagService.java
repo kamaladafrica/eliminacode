@@ -3,8 +3,10 @@ package it.kamaladafrica.eliminacode.service;
 import static com.google.zxing.BarcodeFormat.QR_CODE;
 import static com.google.zxing.EncodeHintType.ERROR_CORRECTION;
 import static com.google.zxing.qrcode.decoder.ErrorCorrectionLevel.M;
+import static it.kamaladafrica.eliminacode.service.DataUriUtils.toDataURI;
 import static java.util.Collections.singletonMap;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.springframework.http.MediaType.IMAGE_PNG_VALUE;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
@@ -22,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -70,7 +73,17 @@ public class TagService {
 		tag.setStaccato(Instant.now());
 		tag = tagRepository.save(tag);
 		log.debug("Staccato nuovo tag: {}", tag);
-		return tagMapper.toDto(tag);
+		return toDto(tag);
+	}
+
+	private TagDTO toDto(Tag tag) {
+		TagDTO dto = tagMapper.toDto(tag);
+		final int qrCodeSize = applicationProperties.getQrcodeSize();
+		String qrCodeText = UriComponentsBuilder.fromHttpUrl(applicationProperties.getQrcodeUrlTemplate())
+				.buildAndExpand(tag.getKey().toString()).toUriString();
+		byte[] qrCode = generateQRCode(tag, qrCodeText, qrCodeSize);
+		dto.setQrCodeImageUrl(toDataURI(qrCode, IMAGE_PNG_VALUE));
+		return dto;
 	}
 
 	protected Optional<Instant> getExpiryInstant() {
@@ -89,10 +102,12 @@ public class TagService {
 		final Instant expiry = getExpiryInstant().orElse(today().plus(1, ChronoUnit.DAYS));
 		final List<Long> fila = tagRepository.findNextProgressivi();
 		final double tempo = applicationProperties.getAverageTempo();
+		final Long progressivo = sequence.previewNextVal().orElse(1L);
 
 		TagStatsDTO stats = new TagStatsDTO();
 		stats.setTempoStimato(tempo);
 		stats.setFila(fila);
+		stats.setProgressivo(progressivo);
 		stats.setTempoLimite(expiry);
 		return stats;
 	}
@@ -135,6 +150,20 @@ public class TagService {
 				});
 	}
 
+	protected byte[] generateQRCode(Tag tag, String url, Integer size) {
+		final int s = defaultIfNull(size, applicationProperties.getQrcodeSize());
+		try {
+			QRCodeWriter barcodeWriter = new QRCodeWriter();
+			BitMatrix bitMatrix = barcodeWriter.encode(url, QR_CODE, s, s, QR_CODE_HINTS);
+			BufferedImage image = MatrixToImageWriter.toBufferedImage(bitMatrix);
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			ImageIO.write(image, "png", os);
+			return os.toByteArray();
+		} catch (WriterException | IOException e) {
+			throw new GenerateQRCodeException(e);
+		}
+	}
+
 	/**
 	 * Get one tag by id.
 	 *
@@ -143,7 +172,7 @@ public class TagService {
 	 */
 	@Transactional(readOnly = true)
 	public Optional<TagDTO> findOne(String key) {
-		return findOneNotExpired(key).map(tagMapper::toDto);
+		return findOneNotExpired(key).map(this::toDto);
 	}
 
 	@Transactional(readOnly = true)
