@@ -10,6 +10,15 @@ public class TagStatsDTO implements Serializable {
 	private Double tempoStimato; // minutes
 	private Instant tempoLimite;
 	private Long progressivo;
+	private Long lastBruciato;
+
+	public Long getLastBruciato() {
+		return lastBruciato;
+	}
+
+	public void setLastBruciato(Long lastBruciato) {
+		this.lastBruciato = lastBruciato;
+	}
 
 	public Long getProgressivo() {
 		return progressivo;
@@ -48,6 +57,7 @@ public class TagStatsDTO implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((fila == null) ? 0 : fila.hashCode());
+		result = prime * result + ((lastBruciato == null) ? 0 : lastBruciato.hashCode());
 		result = prime * result + ((progressivo == null) ? 0 : progressivo.hashCode());
 		result = prime * result + ((tempoLimite == null) ? 0 : tempoLimite.hashCode());
 		result = prime * result + ((tempoStimato == null) ? 0 : tempoStimato.hashCode());
@@ -67,6 +77,11 @@ public class TagStatsDTO implements Serializable {
 			if (other.fila != null)
 				return false;
 		} else if (!fila.equals(other.fila))
+			return false;
+		if (lastBruciato == null) {
+			if (other.lastBruciato != null)
+				return false;
+		} else if (!lastBruciato.equals(other.lastBruciato))
 			return false;
 		if (progressivo == null) {
 			if (other.progressivo != null)
@@ -89,7 +104,7 @@ public class TagStatsDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "TagStatsDTO [fila=" + fila + ", tempoStimato=" + tempoStimato + ", tempoLimite=" + tempoLimite
-				+ ", progressivo=" + progressivo + "]";
+				+ ", progressivo=" + progressivo + ", lastBruciato=" + lastBruciato + "]";
 	}
 
 }

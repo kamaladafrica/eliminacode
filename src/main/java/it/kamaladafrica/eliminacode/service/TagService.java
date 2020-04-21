@@ -103,12 +103,14 @@ public class TagService {
 		final List<Long> fila = tagRepository.findNextProgressivi();
 		final double tempo = applicationProperties.getAverageTempo();
 		final Long progressivo = sequence.previewNextVal().orElse(1L);
+		final Long lastBruciato = tagRepository.getLastBruciatoOfToday().map(Tag::getProgressivo).orElse(0L);
 
 		TagStatsDTO stats = new TagStatsDTO();
 		stats.setTempoStimato(tempo);
 		stats.setFila(fila);
 		stats.setProgressivo(progressivo);
 		stats.setTempoLimite(expiry);
+		stats.setLastBruciato(lastBruciato);
 		return stats;
 	}
 
