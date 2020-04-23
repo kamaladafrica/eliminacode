@@ -167,7 +167,7 @@ jhipster:
 
 application:
    qrcode-size: 160
-   expiry: 3
+   expiry: 10
    average-tempo: 2.5
    qrcode-url-template: https://eliminacode.conadcitycapena.it/api/tags/{key}/brucia
 
