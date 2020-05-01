@@ -194,10 +194,11 @@ public class TagService {
 		return tag;
 	}
 
-	public void brucia(String key) {
-		findOneNotExpired(key).ifPresent(tag -> {
+	public Optional<TagDTO> brucia(String key) {
+		return findOneNotExpired(key).map(tag -> {
 			tag.setBruciato(Instant.now());
 			tagRepository.save(tag);
+			return toDto(tag);
 		});
 	}
 

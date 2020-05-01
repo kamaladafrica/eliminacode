@@ -87,10 +87,7 @@ public class TagResource {
 	@PutMapping("/tags/{key}")
 	public ResponseEntity<TagDTO> bruciaTag(@PathVariable String key) throws URISyntaxException {
 		log.debug("REST request to brucia Tag : {}", key);
-		tagService.brucia(key);
-		return ResponseEntity.noContent()
-				.headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, key))
-				.build();
+		return ResponseUtil.wrapOrNotFound(tagService.brucia(key));
 	}
 
 	/**
@@ -106,7 +103,7 @@ public class TagResource {
 	 */
 	@DeleteMapping("/tags/{key}")
 	public ResponseEntity<TagDTO> eliminaTag(@PathVariable String key) throws URISyntaxException {
-		log.debug("REST request to brucia Tag : {}", key);
+		log.debug("REST request to elimina Tag : {}", key);
 		tagService.delete(key);
 		return ResponseEntity.noContent()
 				.headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, key))
@@ -127,10 +124,11 @@ public class TagResource {
 	@GetMapping("/tags/{key}/brucia")
 	public ResponseEntity<String> bruciaTagUrl(@PathVariable String key) throws URISyntaxException {
 		log.debug("REST request to brucia Tag : {}", key);
-		tagService.brucia(key);
-		return ResponseEntity.ok()
-				.contentType(MediaType.TEXT_PLAIN)
-				.body("Numero bruciato " + key);
+		return tagService.brucia(key)
+				.map(tag -> ResponseEntity.ok()
+						.contentType(MediaType.TEXT_PLAIN)
+						.body("Numero bruciato " + key))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 	/**
