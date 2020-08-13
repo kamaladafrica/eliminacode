@@ -1,14 +1,15 @@
 TODO:
-  ☐ bruciatura mancata entrata se ritardo (>10m)
+  ☐ bruciatura mancata entrata se ritardo (>10m) @high
   ☐ registrazione dell'app che fa la chiamata (totem, web)
   ☐ fare un app mobile dedicata
+  ☐ Controllare il caso che l'ultima bruciatura potrebbe essere un progressivo vecchio @high
 
   ✔ blink tempo attesa in alert @low @done (20-04-28 01:22)
   ✔ verificare cancellazione localstorage quando si disconnette e riconnette @critical @done (20-04-28 01:22)
 
 UTENZA:
  ☐ username: admin
- ☐ password: ylenia.2008!
+ ☐ password: Ylenia2008
 
 
 
